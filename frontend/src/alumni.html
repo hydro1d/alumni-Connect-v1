@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Directory - AlumniConnect</title>
+    <link href="/src/style.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 pb-12 min-h-screen flex flex-col fade-in">
+
+    <div id="navbar-container"></div>
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-br from-primary to-secondary text-white py-12 mb-8 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwbDhfOHptOCAwTDBfOHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMSI+PC9wYXRoPjwvc3ZnPg==')] pointer-events-none"></div>
+        <div class="container mx-auto px-4 max-w-7xl relative z-10 text-center">
+            <h1 class="text-4xl lg:text-5xl font-extrabold mb-4 tracking-tight">Discover the Alumni Network</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">Search by skills, location, or company to locate the perfect mentor to help guide your career journey.</p>
+            
+            <!-- Floating Search Bar -->
+            <div class="mt-8 max-w-3xl mx-auto bg-base-100 p-2 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2">
+                <div class="flex-1 relative flex items-center">
+                    <svg class="w-6 h-6 absolute left-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="search-input" class="input input-ghost w-full pl-12 text-base-content focus:bg-transparent text-lg font-medium" placeholder="Search skills, names, roles..." />
+                </div>
+                <div class="divider sm:divider-horizontal m-0"></div>
+                <div class="flex-1 flex gap-2">
+                    <input type="text" id="filter-company" class="input input-ghost w-full focus:bg-transparent text-base-content" placeholder="Company..." />
+                </div>
+                <button class="btn btn-primary rounded-xl px-8 shadow-md" onclick="loadAlumni()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 flex-grow max-w-7xl">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Filters Sidebar -->
+            <div class="w-full lg:w-1/4">
+                <div class="glass-panel p-6 rounded-3xl sticky top-28">
+                    <h2 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-6 flex items-center justify-between">
+                        Advanced Filters
+                        <button class="btn btn-xs btn-ghost text-primary hover:bg-primary/10" onclick="clearFilters()">Reset</button>
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-medium text-gray-500">Department</span></label>
+                            <input type="text" id="filter-dept" class="input input-sm input-bordered bg-base-200/50" placeholder="e.g. Computer Science" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-medium text-gray-500">Graduation Year</span></label>
+                            <input type="text" id="filter-batch" class="input input-sm input-bordered bg-base-200/50" placeholder="e.g. 2020" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-medium text-gray-500">Location</span></label>
+                            <input type="text" id="filter-location" class="input input-sm input-bordered bg-base-200/50" placeholder="e.g. New York" />
+                        </div>
+                        <button class="btn btn-primary btn-outline btn-sm w-full mt-2" onclick="loadAlumni()">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="w-full lg:w-3/4">
+                <div class="flex justify-between items-center mb-6 px-1">
+                    <h3 class="text-xl font-bold">Network Results</h3>
+                </div>
+
+                <div id="alumni-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Cards render here -->
+                    <div class="col-span-full flex justify-center py-20"><span class="loading loading-spinner text-primary loading-lg"></span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Full Details Modal -->
+    <dialog id="alumni_modal" class="modal">
+        <div class="modal-box p-0 max-w-lg rounded-3xl overflow-hidden bg-base-100 shadow-2xl relative">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 text-white z-10 hover:bg-black/20 border-0 bg-black/10">✕</button>
+            </form>
+            
+            <div class="h-32 bg-gradient-to-tr from-primary to-secondary w-full"></div>
+            
+            <div class="px-8 pb-8 -mt-12 relative">
+                <div class="avatar shadow-xl rounded-full mb-4 ring-4 ring-base-100 bg-base-100 overflow-hidden">
+                    <div class="w-24 h-24 bg-neutral text-white font-bold flex items-center justify-center text-4xl" id="modal-avatar">
+                        ?
+                    </div>
+                </div>
+                
+                <h2 class="text-3xl font-extrabold text-base-content leading-tight" id="modal-name">Name</h2>
+                <p class="text-primary font-bold text-lg mt-1" id="modal-job-company">Role @ Company</p>
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-medium mt-3 flex-wrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span id="modal-dept-batch">Dept • Batch</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-medium mt-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span id="modal-location">Location</span>
+                </div>
+                
+                <div class="divider my-4"></div>
+                
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3">Skills & Expertise</h3>
+                    <div class="flex flex-wrap gap-2" id="modal-skills">
+                        <!-- Skills injected via JS -->
+                    </div>
+                </div>
+
+                <div class="flex gap-3" id="modal-actions">
+                    <!-- Buttons injected via JS -->
+                </div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <script type="module">
+        import { checkAuth, fetchAPI, showToast } from './js/api.js';
+        import { loadNavbar } from './js/navbar.js';
+
+        // Define functions FIRST before execution
+        window.clearFilters = () => {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-dept').value = '';
+            document.getElementById('filter-batch').value = '';
+            document.getElementById('filter-company').value = '';
+            document.getElementById('filter-location').value = '';
+            window.loadAlumni();
+        };
+
+        window.currentAlumniData = [];
+
+        window.loadAlumni = async () => {
+            const grid = document.getElementById('alumni-grid');
+            grid.innerHTML = '<div class="col-span-full flex justify-center py-20"><span class="loading loading-spinner text-primary loading-lg"></span></div>';
+            
+            const params = new URLSearchParams();
+            if(document.getElementById('search-input').value) params.append('search', document.getElementById('search-input').value);
+            if(document.getElementById('filter-dept').value) params.append('department', document.getElementById('filter-dept').value);
+            if(document.getElementById('filter-batch').value) params.append('batch', document.getElementById('filter-batch').value);
+            if(document.getElementById('filter-company').value) params.append('company', document.getElementById('filter-company').value);
+            if(document.getElementById('filter-location').value) params.append('location', document.getElementById('filter-location').value);
+
+            try {
+                const alumni = await fetchAPI(`/users/alumni?${params.toString()}`);
+                window.currentAlumniData = alumni;
+
+                if (alumni.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-16 glass-panel rounded-3xl">
+                            <p class="text-gray-500 font-medium">No alumni found matching your criteria.</p>
+                            <button class="btn btn-sm btn-ghost mt-2" onclick="clearFilters()">Clear Filters</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = alumni.map(a => `
+                    <div class="glass-panel p-6 rounded-3xl hover-lift flex flex-col h-full border border-base-200 cursor-pointer group" onclick="window.showAlumniDetails(${a.id})">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="avatar">
+                                <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-neutral text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+                                    <span class="text-xl font-bold">${(a.name || '?').charAt(0).toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-xl font-bold leading-tight">${a.name || 'Unknown'}</h2>
+                                <p class="text-sm text-gray-500 font-medium mt-1">${a.department || 'N/A'} • ${a.batch ? String(a.batch).slice(-2) : 'N/A'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 flex-grow">
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                <span class="font-semibold">${a.job_title || 'Alumni'} @ ${a.company || 'N/A'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span>${a.location || 'Location hidden'}</span>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-1.5 pt-2">
+                                ${(a.skills || '').split(',').map(s => s.trim()).filter(Boolean).slice(0, 4).map(s => `
+                                    <span class="badge badge-sm badge-ghost text-xs font-semibold">${s}</span>
+                                `).join('')}
+                                ${(a.skills || '').split(',').filter(Boolean).length > 4 ? '<span class="badge badge-sm badge-ghost text-xs">...</span>' : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-base-200">
+                            <button class="btn btn-primary btn-outline w-full rounded-xl group-hover:bg-primary group-hover:text-white transition-all">View Full Profile</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Alumni loading error:", err);
+                grid.innerHTML = `<div class="col-span-full p-4 bg-error/10 text-error rounded-xl font-medium text-center">Failed to load directory. Error: ${err.message || 'Unknown error'}</div>`;
+            }
+        };
+
+        window.showAlumniDetails = (id) => {
+            const a = window.currentAlumniData.find(x => x.id === id);
+            if(!a) return;
+
+            document.getElementById('modal-avatar').innerText = (a.name || '?').charAt(0).toUpperCase();
+            document.getElementById('modal-name').innerText = a.name;
+            document.getElementById('modal-job-company').innerText = `${a.job_title || 'Alumni'} @ ${a.company || 'N/A'}`;
+            document.getElementById('modal-dept-batch').innerText = `${a.department || 'N/A'} • Class of ${a.batch || 'N/A'}`;
+            document.getElementById('modal-location').innerText = a.location || 'Location hidden';
+
+            const skillsArr = (a.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+            document.getElementById('modal-skills').innerHTML = skillsArr.length > 0 
+                ? skillsArr.map(s => `<span class="badge badge-ghost font-semibold">${s}</span>`).join('')
+                : '<span class="text-sm text-gray-400">No specific skills listed.</span>';
+
+            const actionsBox = document.getElementById('modal-actions');
+            actionsBox.innerHTML = ''; // reset
+            
+            // Buttons logic strictly based on roles
+            if (user.role === 'Student') {
+                actionsBox.innerHTML += `
+                    <button class="btn btn-primary shadow-lg flex-1 rounded-xl" onclick="requestMentorship(${a.id})">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        Request Mentorship
+                    </button>
+                    <!-- Strict chat: Only possible after mentorship is accepted, handled dynamically if they want to try it redirects but backend blocks -->
+                    <button class="btn btn-primary btn-outline flex-1 rounded-xl" onclick="window.location.href='/src/messages.html?user=${a.id}'">
+                        Message
+                    </button>
+                `;
+            } else if (user.role === 'Alumni') {
+                actionsBox.innerHTML += `
+                    <button class="btn btn-primary shadow-lg w-full rounded-xl" onclick="window.location.href='/src/messages.html?user=${a.id}'">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        Say Hello!
+                    </button>
+                `;
+            }
+
+            document.getElementById('alumni_modal').showModal();
+        };
+
+        window.requestMentorship = async (alumni_id) => {
+            // Close modal when requesting
+            document.getElementById('alumni_modal').close();
+            try {
+                await fetchAPI('/mentorship/request', {
+                    method: 'POST',
+                    body: JSON.stringify({ alumni_id })
+                });
+                showToast('Mentorship request sent! They will be notified.', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        };
+
+        // Authenticate and Initialize AFTER defining functions
+        const user = checkAuth();
+        if (user) {
+            loadNavbar();
+            window.loadAlumni();
+            
+            // Allow enter key searching
+            document.getElementById('search-input').addEventListener('keypress', e => e.key === 'Enter' && window.loadAlumni());
+        }
+    </script>
+</body>
+</html>
