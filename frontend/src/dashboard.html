@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AlumniConnect</title>
+    <link href="/src/style.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 pb-10 min-h-screen flex flex-col">
+
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto mt-6 px-4 flex-grow max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 fade-in">
+            
+            <!-- Left Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Profile Snippet -->
+                <div class="glass-panel rounded-3xl overflow-hidden relative">
+                    <div class="h-24 bg-gradient-to-r from-primary to-secondary"></div>
+                    <div class="px-6 pb-6 pt-0 text-center relative pointer-events-auto">
+                        <div class="avatar relative -mt-12 mb-3">
+                            <div class="w-24 rounded-full ring ring-base-100 ring-offset-base-100 ring-offset-2 bg-gradient-to-br from-primary to-neutral text-white flex items-center justify-center shadow-lg">
+                                <span id="avatar-letter" class="text-4xl font-bold"></span>
+                            </div>
+                        </div>
+                        <h2 id="user-name" class="text-xl font-bold"></h2>
+                        <p id="user-role-dept" class="text-sm text-gray-500 font-medium"></p>
+                        <div class="divider my-3"></div>
+                        <a href="/src/profile.html" class="text-sm font-semibold text-primary hover:underline">Complete your profile</a>
+                    </div>
+                </div>
+                <!-- Quick Nav -->
+                <div class="glass-panel rounded-3xl p-6 hidden lg:block">
+                    <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-4">Quick Links</h3>
+                    <ul class="menu p-0 gap-1 font-medium">
+                        <li><a href="/src/alumni.html" class="rounded-lg"><svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Find Alumni</a></li>
+                        <li><a href="/src/jobs.html" class="rounded-lg"><svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> Job Board</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Center Feed: Accepted Relationships & Active Mentorships -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Active Relationships -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-extrabold tracking-tight" id="active-relationship-title">My Relationships</h2>
+                    </div>
+                    <div id="accepted-mentorships" class="space-y-4">
+                        <div class="flex justify-center p-4"><span class="loading loading-spinner text-primary"></span></div>
+                    </div>
+                </div>
+
+                <!-- Pending Requests -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold tracking-tight text-gray-400">Mentorship Inbox</h2>
+                    </div>
+                    <div id="pending-mentorships" class="space-y-4">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass-panel rounded-3xl p-6">
+                    <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Suggested Alumni
+                    </h3>
+                    <div id="recommendations-list" class="space-y-4"></div>
+                </div>
+
+                <div class="glass-panel rounded-3xl p-6">
+                    <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-4">Recent Jobs</h3>
+                    <div id="recent-jobs-list" class="space-y-4"></div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script type="module">
+        import { checkAuth, fetchAPI, showToast } from './js/api.js';
+        import { loadNavbar } from './js/navbar.js';
+
+        const user = checkAuth();
+        if (user) {
+            loadNavbar();
+            document.getElementById('avatar-letter').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = user.name;
+            document.getElementById('user-role-dept').textContent = user.role;
+            
+            document.getElementById('active-relationship-title').textContent = user.role === 'Alumni' ? 'My Mentees' : 'My Mentors';
+            
+            loadProfileSummary();
+            loadMentorships();
+            loadRecommendations();
+            loadRecentJobs();
+        }
+
+        async function loadProfileSummary() {
+            try {
+                const profile = await fetchAPI('/users/profile');
+                if (profile && profile.department) {
+                    document.getElementById('user-role-dept').textContent = `${profile.department} ${user.role === 'Student' ? 'Student' : 'Alumni'}`;
+                }
+            } catch(e) {}
+        }
+
+        async function loadMentorships() {
+            const acceptedList = document.getElementById('accepted-mentorships');
+            const pendingList = document.getElementById('pending-mentorships');
+            
+            try {
+                const requests = await fetchAPI('/mentorship/requests');
+                
+                const accepted = requests.filter(r => r.status === 'accepted');
+                const pending = requests.filter(r => r.status === 'pending');
+                const rejected = requests.filter(r => r.status === 'rejected');
+                
+                // Render Accepted / Active Mentors
+                if (accepted.length === 0) {
+                    acceptedList.innerHTML = `
+                        <div class="text-center py-6 opacity-60">
+                            <svg class="w-10 h-10 mx-auto mb-2 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <p class="font-medium text-sm">No active relationships yet.</p>
+                        </div>`;
+                } else {
+                    acceptedList.innerHTML = accepted.map(req => {
+                        const targetName = user.role === 'Student' ? req.alumni_name : req.student_name;
+                        const targetId = user.role === 'Student' ? req.alumni_id : req.student_id;
+                        return `
+                        <div class="group flex flex-col sm:flex-row items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/20 hover:border-primary/50 transition-all gap-4">
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="avatar placeholder">
+                                    <div class="bg-primary text-white rounded-full w-12 h-12 shadow-md font-bold text-lg">
+                                        <span>${targetName.charAt(0)}</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg leading-tight">${targetName}</p>
+                                    <p class="text-xs text-primary font-bold mt-1">Status: Active</p>
+                                </div>
+                                <button onclick="window.location.href='/src/messages.html?user=${targetId}'" class="btn btn-primary shadow-lg hover:-translate-y-0.5 transition-transform">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                    Chat
+                                </button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Render Pending/Inbox
+                if (pending.length === 0 && rejected.length === 0) {
+                    pendingList.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Inbox is clean.</p>';
+                } else {
+                    const allOther = [...pending, ...rejected];
+                    pendingList.innerHTML = allOther.map(req => {
+                        const targetName = user.role === 'Student' ? req.alumni_name : req.student_name;
+                        return `
+                        <div class="flex items-center justify-between p-3 bg-base-100 rounded-xl border border-base-200">
+                            <div class="flex items-center gap-3">
+                                <div class="avatar placeholder">
+                                    <div class="bg-neutral text-neutral-content rounded-full w-10 font-bold">${targetName.charAt(0)}</div>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm">${targetName}</p>
+                                    <span class="badge badge-sm badge-outline ${req.status === 'rejected' ? 'badge-error' : 'badge-warning'}">${req.status}</span>
+                                </div>
+                            </div>
+                            ${user.role === 'Alumni' && req.status === 'pending' ? `
+                                <div class="flex gap-2">
+                                    <button onclick="updateRequest(${req.id}, 'accepted')" class="btn btn-primary btn-sm px-4">Accept</button>
+                                    <button onclick="updateRequest(${req.id}, 'rejected')" class="btn btn-ghost text-error btn-sm">Decline</button>
+                                </div>
+                            ` : ''}
+                        </div>`;
+                    }).join('');
+                }
+
+            } catch (err) {
+                acceptedList.innerHTML = '<p class="text-error font-medium">Failed to load requests.</p>';
+                pendingList.innerHTML = '';
+            }
+        }
+
+        window.updateRequest = async (id, status) => {
+            try {
+                await fetchAPI(`/mentorship/request/${id}`, { method: 'PUT', body: JSON.stringify({ status }) });
+                showToast(`Mentorship ${status}`, status === 'accepted' ? 'success' : '');
+                loadMentorships();
+            } catch (err) { showToast(err.message, 'error'); }
+        };
+
+        // Render generic recs/jobs
+        async function loadRecommendations() {
+            const list = document.getElementById('recommendations-list');
+            try {
+                const recs = await fetchAPI('/users/recommendations');
+                if (!recs || recs.length === 0) return list.innerHTML = '<p class="text-xs text-gray-500">No suggestions right now.</p>';
+                list.innerHTML = recs.map(r => `
+                    <div class="flex items-center gap-3 p-2 hover:bg-base-200 rounded-xl transition-colors cursor-pointer" onclick="window.location.href='/src/alumni.html'">
+                        <div class="avatar placeholder"><div class="bg-primary/20 text-primary font-bold rounded-full w-10"><span>${r.name.charAt(0)}</span></div></div>
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-sm font-bold truncate">${r.name}</p>
+                            <p class="text-xs text-gray-500 truncate">${r.job_title || r.department}</p>
+                        </div>
+                    </div>`).join('');
+            } catch (err) { list.innerHTML = ''; }
+        }
+
+        async function loadRecentJobs() {
+            const list = document.getElementById('recent-jobs-list');
+            try {
+                const jobs = await fetchAPI('/jobs/recent');
+                if (!jobs || jobs.length === 0) return list.innerHTML = '<p class="text-xs text-gray-500">No recent jobs.</p>';
+                list.innerHTML = jobs.map(j => `
+                    <div class="p-3 bg-base-100 border border-base-200 rounded-xl cursor-pointer" onclick="window.location.href='/src/jobs.html'">
+                        <p class="font-bold text-sm leading-tight mb-1">${j.title}</p>
+                        <p class="text-xs text-primary font-semibold">${j.company}</p>
+                    </div>`).join('');
+            } catch (err) { list.innerHTML = ''; }
+        }
+    </script>
+</body>
+</html>
