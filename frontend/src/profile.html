@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AlumniConnect</title>
+    <link href="/src/style.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 pb-12 min-h-screen flex flex-col fade-in">
+
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto mt-6 px-4 flex-grow max-w-4xl">
+        
+        <!-- Profile Header/Banner -->
+        <div class="glass-panel rounded-t-3xl rounded-b-xl overflow-hidden mb-6 relative">
+            <!-- Cover Photo Area -->
+            <div class="h-48 bg-gradient-to-r from-primary via-indigo-500 to-secondary relative">
+                <!-- Abstract waves/shapes -->
+                <div class="absolute inset-0 opacity-20 overflow-hidden">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full fill-current text-white">
+                        <path d="M0,50 C20,30 40,70 60,50 C80,30 100,50 100,50 L100,100 L0,100 Z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="px-8 pb-8 pt-0 relative z-10 flex flex-col md:flex-row items-center md:items-end gap-6">
+                <!-- Avatar -->
+                <div class="avatar -mt-20">
+                    <div class="w-36 rounded-full ring-4 ring-base-100 bg-gradient-to-br from-primary to-neutral text-white flex items-center justify-center shadow-2xl">
+                        <span id="avatar-letter" class="text-6xl font-extrabold pb-2"></span>
+                    </div>
+                </div>
+                
+                <!-- Basic Info -->
+                <div class="flex-1 text-center md:text-left">
+                    <h1 class="text-3xl font-extrabold" id="prof-name">Loading...</h1>
+                    <p class="text-lg text-primary font-semibold mt-1" id="prof-headline">Enhance your profile below</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Left Info Sidebar (Preview) -->
+            <div class="md:col-span-1 space-y-6">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-4">About Me</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
+                            <p class="font-medium" id="display-location">Not set</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Department</p>
+                            <p class="font-medium" id="display-dept">Not set</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Batch</p>
+                            <p class="font-medium" id="display-batch">Not set</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Editing Form -->
+            <div class="md:col-span-2">
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-base-200">
+                        <h2 class="text-2xl font-bold">Edit Profile</h2>
+                        <span class="badge badge-success badge-outline font-bold" id="saved-badge" style="opacity: 0; transition: opacity 0.3s;">Saved</span>
+                    </div>
+                    
+                    <form id="profile-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-medium text-gray-500">Department</span></label>
+                                <input type="text" id="prof-dept" class="input input-bordered focus:border-primary focus:bg-base-100 bg-base-200/50" placeholder="e.g. Computer Science" />
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-medium text-gray-500">Class / Batch</span></label>
+                                <input type="text" id="prof-batch" class="input input-bordered focus:border-primary focus:bg-base-100 bg-base-200/50" placeholder="e.g. 2021" />
+                            </div>
+                            
+                            <div class="form-control md:col-span-2 mt-4">
+                                <h3 class="font-bold text-lg mb-2">Professional Experience</h3>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-medium text-gray-500">Company / Organization</span></label>
+                                <input type="text" id="prof-company" class="input input-bordered focus:border-primary focus:bg-base-100 bg-base-200/50" placeholder="e.g. Google" />
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-medium text-gray-500">Job Title</span></label>
+                                <input type="text" id="prof-title" class="input input-bordered focus:border-primary focus:bg-base-100 bg-base-200/50" placeholder="e.g. Software Engineer" />
+                            </div>
+
+                            <div class="form-control md:col-span-2 mt-4">
+                                <h3 class="font-bold text-lg mb-2">Additional Info</h3>
+                            </div>
+
+                            <div class="form-control md:col-span-2">
+                                <label class="label"><span class="label-text font-medium text-gray-500">Location (City, Country)</span></label>
+                                <input type="text" id="prof-location" class="input input-bordered focus:border-primary focus:bg-base-100 bg-base-200/50" placeholder="e.g. San Francisco, CA" />
+                            </div>
+
+                            <div class="form-control md:col-span-2">
+                                <label class="label">
+                                    <span class="label-text font-medium text-gray-500">Top Skills</span>
+                                </label>
+                                <textarea id="prof-skills" class="textarea textarea-bordered focus:border-primary focus:bg-base-100 bg-base-200/50 min-h-[100px]" placeholder="e.g. JavaScript, React, System Design, Mentorship..."></textarea>
+                                <label class="label"><span class="label-text-alt text-gray-400">Comma separated. These help power our smart recommendation engine.</span></label>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex justify-end pt-4 border-t border-base-200">
+                            <button type="submit" class="btn btn-primary px-10 rounded-xl h-12 text-md shadow-lg shadow-primary/30">Save Profile</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { checkAuth, fetchAPI, showToast } from './js/api.js';
+        import { loadNavbar } from './js/navbar.js';
+
+        const user = checkAuth();
+        if (user) {
+            loadNavbar();
+            document.getElementById('prof-name').textContent = user.name;
+            document.getElementById('avatar-letter').textContent = user.name.charAt(0).toUpperCase();
+            loadProfile();
+        }
+
+        async function loadProfile() {
+            try {
+                const profile = await fetchAPI('/users/profile');
+                
+                // Form fields
+                document.getElementById('prof-dept').value = profile.department || '';
+                document.getElementById('prof-batch').value = profile.batch || '';
+                document.getElementById('prof-company').value = profile.company || '';
+                document.getElementById('prof-title').value = profile.job_title || '';
+                document.getElementById('prof-location').value = profile.location || '';
+                document.getElementById('prof-skills').value = profile.skills || '';
+
+                // Header & Sidebar UI updates
+                if (profile.job_title && profile.company) {
+                    document.getElementById('prof-headline').textContent = `${profile.job_title} at ${profile.company}`;
+                } else if (profile.department) {
+                    document.getElementById('prof-headline').textContent = `${profile.department} ${user.role}`;
+                }
+                
+                document.getElementById('display-location').textContent = profile.location || 'Not set';
+                document.getElementById('display-dept').textContent = profile.department || 'Not set';
+                document.getElementById('display-batch').textContent = profile.batch || 'Not set';
+
+            } catch (err) {
+                showToast('Failed to load profile data', 'error');
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading loading-spinner"></span> Saving...';
+            btn.disabled = true;
+
+            try {
+                await fetchAPI('/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        department: document.getElementById('prof-dept').value,
+                        batch: document.getElementById('prof-batch').value,
+                        company: document.getElementById('prof-company').value,
+                        job_title: document.getElementById('prof-title').value,
+                        location: document.getElementById('prof-location').value,
+                        skills: document.getElementById('prof-skills').value
+                    })
+                });
+                
+                // Show flash saving badge
+                const badge = document.getElementById('saved-badge');
+                badge.style.opacity = '1';
+                setTimeout(() => badge.style.opacity = '0', 3000);
+
+                // Reload display fields
+                loadProfile();
+
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
