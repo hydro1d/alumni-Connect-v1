@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlumniConnect - Launch Your Network</title>
+    <link href="/src/style.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 min-h-screen">
+
+    <div class="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+        <!-- Abstract Background Vectors -->
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="w-full max-w-5xl bg-base-100 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row z-10 border border-base-200 fade-in">
+            
+            <!-- Left Branding Side -->
+            <div class="w-full md:w-5/12 bg-gradient-to-br from-primary to-neutral text-white p-10 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-white text-primary rounded-xl flex items-center justify-center font-bold text-3xl shadow-lg mb-6 pb-1">
+                        A
+                    </div>
+                    <h1 class="text-4xl font-extrabold mb-4 leading-tight">AlumniConnect</h1>
+                    <p class="text-primary-content text-lg opacity-90">Building bridges between ambitious students and experienced industry leaders.</p>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="bg-white/10 p-6 rounded-2xl backdrop-blur-md border border-white/20">
+                        <p class="text-sm italic">"This platform helped me land my dream job at Microsoft through a single 15-minute mentorship call."</p>
+                        <div class="mt-4 flex items-center gap-3">
+                            <div class="avatar">
+                                <div class="w-8 rounded-full bg-white/20">
+                                    <span class="text-xs flex items-center justify-center h-full">D</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold">Dana Lee</p>
+                                <p class="text-xs opacity-70">Business Administration, '26</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Forms Side -->
+            <div class="w-full md:w-7/12 p-8 lg:p-12">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 id="form-title" class="text-2xl font-bold">Welcome back</h2>
+                    <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm">
+                        <input type="checkbox" id="theme-toggle" />
+                        <svg class="swap-on fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+                        <svg class="swap-off fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/></svg>
+                    </label>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs tabs-boxed mb-8 bg-base-200 p-1 rounded-xl">
+                    <a class="tab tab-active transition-all font-semibold rounded-lg h-10 flex-1" id="tab-login" onclick="switchTab('login')">Sign In</a>
+                    <a class="tab transition-all font-semibold rounded-lg h-10 flex-1" id="tab-register" onclick="switchTab('register')">Create Account</a>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="space-y-5 fade-in">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-medium">Email Address</span></label>
+                        <input type="email" id="login-email" class="input input-bordered focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-base-100" required placeholder="you@example.com" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Password</span>
+                            <a href="#" class="label-text-alt link link-primary">Forgot?</a>
+                        </label>
+                        <input type="password" id="login-password" class="input input-bordered focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-base-100" required placeholder="••••••••" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full mt-4 h-12 text-lg">Access Platform</button>
+                    <p class="text-center text-sm text-gray-500 mt-6">Use credentials like alice@alumni.com / password123</p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="hidden space-y-4 fade-in">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-medium">Full Name</span></label>
+                        <input type="text" id="reg-name" class="input input-bordered focus:border-primary focus:ring-1 bg-base-100" required placeholder="Jane Doe" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-medium">Email Address</span></label>
+                        <input type="email" id="reg-email" class="input input-bordered focus:border-primary focus:ring-1 bg-base-100" required placeholder="jane@example.com" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-medium">Password</span></label>
+                            <input type="password" id="reg-password" class="input input-bordered focus:border-primary focus:ring-1 bg-base-100" required minlength="6" placeholder="••••••••" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-medium">I am a...</span></label>
+                            <select id="reg-role" class="select select-bordered focus:border-primary focus:ring-1 bg-base-100 font-normal" required>
+                                <option disabled selected>Select Role</option>
+                                <option value="Student">Current Student</option>
+                                <option value="Alumni">Alumni</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-control mt-2">
+                        <label class="cursor-pointer label justify-start gap-3">
+                            <input type="checkbox" required class="checkbox checkbox-primary checkbox-sm rounded" />
+                            <span class="label-text text-sm">I agree to the Terms of Service and Privacy Policy</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full h-12 text-lg mt-2">Create Account</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script type="module">
+        import { fetchAPI, isAuthenticated, showToast, toggleTheme } from './src/js/api.js';
+
+        if (isAuthenticated()) {
+            window.location.href = '/src/dashboard.html';
+        }
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dim') themeToggle.checked = true;
+        themeToggle.addEventListener('change', toggleTheme);
+
+        window.switchTab = (tab) => {
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('tab-login').classList.toggle('tab-active', tab === 'login');
+            document.getElementById('tab-register').classList.toggle('tab-active', tab === 'register');
+            document.getElementById('form-title').innerText = tab === 'login' ? 'Welcome back' : 'Join the network';
+            
+            document.getElementById('login-form').classList.remove('fade-in');
+            document.getElementById('register-form').classList.remove('fade-in');
+            void document.getElementById(tab + '-form').offsetWidth; 
+            document.getElementById(tab + '-form').classList.add('fade-in');
+        };
+
+        // Handle Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="loading loading-spinner"></span> Authenticating...';
+            btn.disabled = true;
+
+            try {
+                const data = await fetchAPI('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: document.getElementById('login-email').value,
+                        password: document.getElementById('login-password').value
+                    })
+                });
+                
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data));
+                showToast('Welcome back!', 'success');
+                setTimeout(() => window.location.href = '/src/dashboard.html', 800);
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Handle Registration
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const role = document.getElementById('reg-role').value;
+            if (role === 'Select Role') return showToast('Please select a role', 'error');
+
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="loading loading-spinner"></span> Creating Account...';
+            btn.disabled = true;
+
+            try {
+                const data = await fetchAPI('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: document.getElementById('reg-name').value,
+                        email: document.getElementById('reg-email').value,
+                        password: document.getElementById('reg-password').value,
+                        role
+                    })
+                });
+
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify({
+                    id: data.id, name: data.name, email: data.email, role: data.role
+                }));
+                showToast('Registration successful! Welcome.', 'success');
+                setTimeout(() => window.location.href = '/src/dashboard.html', 800);
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
