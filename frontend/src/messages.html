@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - AlumniConnect</title>
+    <link href="/src/style.css" rel="stylesheet">
+</head>
+<body class="bg-base-200 min-h-screen flex flex-col h-screen overflow-hidden fade-in">
+
+    <div id="navbar-container" class="flex-none"></div>
+
+    <main class="container mx-auto px-4 flex-grow max-w-5xl flex flex-col pt-6 pb-6 overflow-hidden">
+        <div class="glass-panel flex-grow rounded-3xl overflow-hidden flex flex-col border border-base-200 shadow-2xl relative">
+            
+            <div id="error-overlay" class="absolute inset-0 bg-base-100 z-20 flex flex-col items-center justify-center hidden">
+                <svg class="w-16 h-16 text-error mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <h2 class="text-2xl font-bold text-error">Access Denied</h2>
+                <p class="text-base-content mt-2 max-w-md text-center" id="error-message">You are not authorized to message this person.</p>
+                <button onclick="window.location.href='/src/dashboard.html'" class="btn btn-primary mt-6">Return to Dashboard</button>
+            </div>
+
+            <!-- Chat Header -->
+            <div class="h-20 bg-gradient-to-r from-primary to-secondary text-white px-6 flex items-center justify-between flex-none">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.history.back()" class="btn btn-circle btn-ghost btn-sm text-white hover:bg-white/20">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <div class="avatar placeholder">
+                        <div class="bg-white text-primary rounded-full w-10 shadow-md font-bold text-lg">
+                            <span id="chat-avatar">?</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold tracking-tight" id="chat-title">Loading...</h2>
+                        <span class="text-xs font-medium opacity-80" id="chat-subtitle">Fetching connection...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="messages-container" class="flex-grow overflow-y-auto p-6 space-y-4 bg-base-100/50">
+                <div class="flex justify-center h-full items-center"><span class="loading loading-spinner text-primary loading-lg"></span></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 bg-base-100 border-t border-base-200 flex-none">
+                <form id="chat-form" class="flex gap-2">
+                    <input type="text" id="chat-input" class="input input-bordered w-full rounded-2xl bg-base-200/50 focus:bg-base-100 focus:border-primary disabled:opacity-50" placeholder="Type your message here..." disabled autocomplete="off" />
+                    <button type="submit" id="send-btn" class="btn btn-primary btn-circle shadow-lg disabled:opacity-50" disabled>
+                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
+                </form>
+            </div>
+            
+        </div>
+    </main>
+
+    <script type="module">
+        import { checkAuth, fetchAPI, showToast } from './js/api.js';
+        import { loadNavbar } from './js/navbar.js';
+
+        const user = checkAuth();
+        let targetUserId = null;
+
+        if (user) {
+            loadNavbar();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            targetUserId = urlParams.get('user');
+
+            if (!targetUserId) {
+                document.getElementById('error-overlay').classList.remove('hidden');
+                document.getElementById('error-message').innerText = 'No user specified to chat with.';
+            } else {
+                initChat();
+            }
+        }
+
+        async function initChat() {
+            // First we fetch the target user's details through a workaround:
+            // The chat history API does not return the target user's name if there are 0 messages.
+            // But we can enable the input and fetch messages!
+            document.getElementById('chat-title').innerText = "Direct Message";
+            document.getElementById('chat-subtitle').innerText = "Secure Mentorship Channel";
+
+            await loadMessages();
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            
+            // Poll for messages every 5 seconds
+            setInterval(loadMessages, 5000);
+        }
+
+        async function loadMessages() {
+            const container = document.getElementById('messages-container');
+            try {
+                const messages = await fetchAPI(`/chat/${targetUserId}`);
+                
+                // Determine target name from messages if available
+                if(messages.length > 0) {
+                    const otherMsg = messages.find(m => m.sender_id !== user.id);
+                    if(otherMsg) {
+                        document.getElementById('chat-title').innerText = otherMsg.sender_name;
+                        document.getElementById('chat-avatar').innerText = otherMsg.sender_name.charAt(0);
+                    }
+                }
+
+                if (messages.length === 0) {
+                    if (container.querySelector('.loading')) {
+                        container.innerHTML = `
+                            <div class="h-full flex flex-col items-center justify-center opacity-50">
+                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                <p class="font-medium">Say hello to kickoff the conversation!</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Avoid re-rendering if message count is same (super basic diffing)
+                if (container.dataset.count == messages.length) return;
+                container.dataset.count = messages.length;
+
+                container.innerHTML = messages.map(m => {
+                    const isMe = m.sender_id === user.id;
+                    const date = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    if (isMe) {
+                        return `
+                        <div class="chat chat-end animate-fade-in-up">
+                            <div class="chat-header opacity-50 text-xs mb-1">Me <time class="text-xs opacity-50 ml-1">${date}</time></div>
+                            <div class="chat-bubble chat-bubble-primary shadow-sm leading-relaxed">${escapeHtml(m.content)}</div>
+                        </div>`;
+                    } else {
+                        return `
+                        <div class="chat chat-start animate-fade-in-up">
+                            <div class="chat-header opacity-50 text-xs mb-1 font-bold">${m.sender_name} <time class="font-normal text-xs opacity-50 ml-1">${date}</time></div>
+                            <div class="chat-bubble bg-base-200 text-base-content shadow-sm leading-relaxed">${escapeHtml(m.content)}</div>
+                        </div>`;
+                    }
+                }).join('');
+
+                // Scroll to bottom
+                container.scrollTop = container.scrollHeight;
+
+            } catch (err) {
+                if (container.querySelector('.loading')) {
+                    document.getElementById('error-overlay').classList.remove('hidden');
+                    document.getElementById('error-message').innerText = err.message;
+                }
+            }
+        }
+
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const content = input.value.trim();
+            if (!content) return;
+
+            input.value = '';
+            input.disabled = true;
+
+            try {
+                await fetchAPI(`/chat/${targetUserId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ content })
+                });
+                await loadMessages();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                input.disabled = false;
+                input.focus();
+            }
+        });
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
