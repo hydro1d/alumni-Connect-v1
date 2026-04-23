@@ -1,29 +1,17 @@
-const mysql = require('mysql2/promise');
+const db = require('./config/db');
 const bcrypt = require('bcryptjs');
-const dotenv = require('dotenv');
-
-dotenv.config();
 
 const seedDatabase = async () => {
     try {
-        const pool = mysql.createPool({
-            host: process.env.DB_HOST || 'localhost',
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'alumniconnect',
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0
-        });
+        console.log('Connecting to database via config/db...');
 
-        console.log('Connecting to database...');
-
-        await pool.query('SET FOREIGN_KEY_CHECKS = 0');
-        await pool.query('TRUNCATE TABLE MentorshipRequests');
-        await pool.query('TRUNCATE TABLE Jobs');
-        await pool.query('TRUNCATE TABLE Profiles');
-        await pool.query('TRUNCATE TABLE Users');
-        await pool.query('SET FOREIGN_KEY_CHECKS = 1');
+        // Clear existing data
+        await db.query('SET FOREIGN_KEY_CHECKS = 0');
+        await db.query('TRUNCATE TABLE MentorshipRequests');
+        await db.query('TRUNCATE TABLE Jobs');
+        await db.query('TRUNCATE TABLE Profiles');
+        await db.query('TRUNCATE TABLE Users');
+        await db.query('SET FOREIGN_KEY_CHECKS = 1');
 
         console.log('Cleared existing data.');
 
@@ -47,14 +35,14 @@ const seedDatabase = async () => {
         ];
 
         let insertUsersQuery = 'INSERT INTO Users (name, email, password, role) VALUES ?';
-        const [userResult] = await pool.query(insertUsersQuery, [users]);
+        const [userResult] = await db.query(insertUsersQuery, [users]);
 
-        // Insert IDs starting from the first insertId
+        // In MySQL, insertId for bulk insert is the first ID
         const startId = userResult.insertId;
-        const alumniIds = [startId, startId+1, startId+2, startId+3, startId+4, startId+5];
-        const studentIds = [startId+6, startId+7, startId+8, startId+9, startId+10, startId+11];
+        console.log(`Inserted 12 users starting from ID: ${startId}`);
 
-        console.log('Inserted Users.');
+        const alumniIds = [startId, startId + 1, startId + 2, startId + 3, startId + 4, startId + 5];
+        const studentIds = [startId + 6, startId + 7, startId + 8, startId + 9, startId + 10, startId + 11];
 
         // 2. Insert Profiles
         const profiles = [
@@ -74,8 +62,7 @@ const seedDatabase = async () => {
         ];
 
         let insertProfilesQuery = 'INSERT INTO Profiles (user_id, department, batch, company, job_title, skills, location) VALUES ?';
-        await pool.query(insertProfilesQuery, [profiles]);
-
+        await db.query(insertProfilesQuery, [profiles]);
         console.log('Inserted Profiles.');
 
         // 3. Insert Jobs
@@ -90,8 +77,7 @@ const seedDatabase = async () => {
         ];
 
         let insertJobsQuery = 'INSERT INTO Jobs (title, company, description, location, posted_by) VALUES ?';
-        await pool.query(insertJobsQuery, [jobs]);
-
+        await db.query(insertJobsQuery, [jobs]);
         console.log('Inserted Jobs.');
 
         // 4. Insert Mentorship Requests
@@ -106,18 +92,17 @@ const seedDatabase = async () => {
         ];
 
         let insertRequestsQuery = 'INSERT INTO MentorshipRequests (student_id, alumni_id, status) VALUES ?';
-        await pool.query(insertRequestsQuery, [requests]);
-
+        await db.query(insertRequestsQuery, [requests]);
         console.log('Inserted Mentorship Requests.');
 
-        console.log('\\n==========================================');
-        console.log('Database seeded with 10+ records successfully!');
+        console.log('\n==========================================');
+        console.log('Database seeded with 12 users successfully!');
         console.log('Every account uses the password: password123');
         console.log('Alumni: alice@, bob@, eva@, frank@, grace@, henry@ (-alumni.com)');
         console.log('Students: charlie@, dana@, ivy@, jack@, karen@, leo@ (-student.com)');
-        console.log('==========================================\\n');
+        console.log('==========================================\n');
 
-        process.exit();
+        process.exit(0);
     } catch (error) {
         console.error('Error seeding database:', error);
         process.exit(1);
